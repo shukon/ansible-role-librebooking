@@ -53,8 +53,8 @@ librebooking_container_http_host_bind_port: ""
 ########################################################################
 
 librebooking_database_hostname: ''
-librebooking_database_name: librebooking
-librebooking_database_username: librebooking
+librebooking_database_name: "{{ librebooking_identifier | replace('-', '_') }}"
+librebooking_database_username: "{{ librebooking_identifier | replace('-', '_') }}"
 librebooking_database_password: ''
 
 ########################################################################
