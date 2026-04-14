@@ -1,0 +1,23 @@
+---
+galaxy_info:
+  role_name: librebooking
+  namespace: mother_of_all_self_hosting
+  author: mother-of-all-self-hosting
+  description: An Ansible role for installing LibreBooking, a resource scheduling application
+  license: AGPL-3.0-or-later
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+    - name: Ubuntu
+      versions:
+        - all
+  galaxy_tags:
+    - docker
+    - self-hosting
+    - scheduling
+    - booking
+    - librebooking
+
+dependencies: []

@@ -1,0 +1,131 @@
+# SPDX-FileCopyrightText: 2026 shukon (https://github.com/shukon)
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Check existence of LibreBooking systemd service
+  ansible.builtin.stat:
+    path: "{{ devture_systemd_docker_base_systemd_path }}/{{ librebooking_identifier }}.service"
+  register: librebooking_service_stat
+
+- name: Uninstall LibreBooking systemd services and files
+  when: librebooking_service_stat.stat.exists | bool
+  block:
+    - name: Ensure LibreBooking systemd service is stopped
+      ansible.builtin.service:
+        name: "{{ librebooking_identifier }}"
+        state: stopped
+        enabled: false
+        daemon_reload: true
+
+    - name: Ensure LibreBooking systemd service does not exist
+      ansible.builtin.file:
+        path: "{{ devture_systemd_docker_base_systemd_path }}/{{ librebooking_identifier }}.service"
+        state: absent
+
+    - name: Ensure LibreBooking support files do not exist
+      ansible.builtin.file:
+        path: "{{ librebooking_base_path }}/{{ item }}"
+        state: absent
+      with_items:
+        - env
+        - labels
+
+    - name: Ensure LibreBooking local path for configuration files does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ librebooking_config_path }}"
+      register: librebooking_config_path_deletion_result
+      changed_when: librebooking_config_path_deletion_result.rc == 0
+      failed_when: false
+
+    - name: Ensure LibreBooking local path for images uploads does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ librebooking_uploads_images_path }}"
+      register: librebooking_uploads_images_path_deletion_result
+      changed_when: librebooking_uploads_images_path_deletion_result.rc == 0
+      failed_when: false
+
+    - name: Ensure LibreBooking local path for reservation uploads does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ librebooking_uploads_reservation_path }}"
+      register: librebooking_uploads_reservation_path_deletion_result
+      changed_when: librebooking_uploads_reservation_path_deletion_result.rc == 0
+      failed_when: false
+
+    - name: Ensure LibreBooking base path does not exist if empty
+      ansible.builtin.command:
+        cmd: "rmdir {{ librebooking_base_path }}"
+      register: librebooking_base_path_deletion_result
+      changed_when: librebooking_base_path_deletion_result.rc == 0
+      failed_when: false
+
+    - name: Ensure LibreBooking container network does not exist
+      when: librebooking_container_network_deletion_enabled
+      block:
+        - name: Ensure LibreBooking container network does not exist via community.docker.docker_network
+          when: devture_systemd_docker_base_container_network_creation_method == 'ansible-module'
+          community.docker.docker_network:
+            name: "{{ librebooking_container_network }}"
+            state: absent
+          register: librebooking_network_deletion_result
+
+        - name: Ensure LibreBooking container network does not exist via ansible.builtin.command
+          when: devture_systemd_docker_base_container_network_creation_method == 'command'
+          ansible.builtin.command:
+            cmd: >-
+              {{ devture_systemd_docker_base_host_command_docker }} network rm
+              {{ librebooking_container_network }}
+          register: librebooking_network_deletion_result
+          changed_when: librebooking_container_network in librebooking_network_deletion_result.stdout
+
+- name: Check existence of LibreBooking local path for configuration files
+  ansible.builtin.stat:
+    path: "{{ librebooking_config_path }}"
+  register: librebooking_config_path_stat
+
+# We just want to notify the user. Deleting data is too destructive.
+- name: Notify if LibreBooking configuration files remain
+  when: librebooking_config_path_stat.stat.exists | bool
+  ansible.builtin.set_fact:
+    devture_playbook_runtime_messages_list: |
+      {{
+        devture_playbook_runtime_messages_list | default([])
+        +
+        [
+          "Note: As the local LibreBooking instance has been removed, some old data remains in `" + librebooking_config_path + "`. Feel free to delete it."
+        ]
+      }}
+
+- name: Check existence of LibreBooking local path for uploaded images
+  ansible.builtin.stat:
+    path: "{{ librebooking_uploads_images_path }}"
+  register: librebooking_uploads_images_path_stat
+
+- name: Notify if LibreBooking uploaded images remain
+  when: librebooking_uploads_images_path_stat.stat.exists | bool
+  ansible.builtin.set_fact:
+    devture_playbook_runtime_messages_list: |
+      {{
+        devture_playbook_runtime_messages_list | default([])
+        +
+        [
+          "Note: As the local LibreBooking instance has been removed, some old data remains in `" + librebooking_uploads_images_path + "`. Feel free to delete it."
+        ]
+      }}
+
+- name: Check existence of LibreBooking local path for reservation uploads
+  ansible.builtin.stat:
+    path: "{{ librebooking_uploads_reservation_path }}"
+  register: librebooking_uploads_reservation_path_stat
+
+- name: Notify if LibreBooking reservation uploads remain
+  when: librebooking_uploads_reservation_path_stat.stat.exists | bool
+  ansible.builtin.set_fact:
+    devture_playbook_runtime_messages_list: |
+      {{
+        devture_playbook_runtime_messages_list | default([])
+        +
+        [
+          "Note: As the local LibreBooking instance has been removed, some old data remains in `" + librebooking_uploads_reservation_path + "`. Feel free to delete it."
+        ]
+      }}

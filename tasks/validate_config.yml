@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: 2026 shukon (https://github.com/shukon)
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+########################################################################
+#                                                                      #
+# Deprecation warnings                                                 #
+#                                                                      #
+########################################################################
+
+- name: (Deprecation) Catch and report renamed settings
+  ansible.builtin.fail:
+    msg: >-
+      Your configuration contains a variable, which now has a different name.
+      Please change your configuration to rename the variable (`{{ item.old }}` -> `{{ item.new }}`).
+  when: "lookup('ansible.builtin.varnames', ('^' + item.old + '$'), wantlist=True) | length > 0"
+  with_items: []
+
+########################################################################
+#                                                                      #
+# Validation                                                           #
+#                                                                      #
+########################################################################
+
+- name: Fail if required LibreBooking settings not defined
+  ansible.builtin.fail:
+    msg: >-
+      You need to define a required configuration setting (`{{ item }}`).
+  when: "lookup('vars', item, default='') | string | length == 0"
+  with_items:
+    - librebooking_uid
+    - librebooking_gid
+    - librebooking_hostname
+    - librebooking_container_network
+    - librebooking_database_hostname
+    - librebooking_database_password
+    - librebooking_install_password
+
+- name: Run if Traefik is enabled
+  when: librebooking_container_labels_traefik_enabled | bool
+  block:
+    - name: Fail if Traefik settings required for LibreBooking are not defined
+      ansible.builtin.fail:
+        msg: >-
+          You need to define a required configuration setting (`{{ item }}`).
+      when: "lookup('vars', item, default='') | string | length == 0"
+      with_items:
+        - librebooking_container_labels_traefik_hostname
+        - librebooking_container_labels_traefik_path_prefix
+
+    - name: Fail if librebooking_path_prefix ends with a slash and is not /
+      ansible.builtin.fail:
+        msg: >-
+          librebooking_path_prefix (`{{ librebooking_path_prefix }}`) must either be `/`
+          or must not end with a slash (e.g. `/booking`).
+      when: "librebooking_path_prefix != '/' and librebooking_path_prefix[-1] == '/'"

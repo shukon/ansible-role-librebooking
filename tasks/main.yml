@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2026 shukon (https://github.com/shukon)
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+---
+- name: Perform LibreBooking installation tasks
+  when: librebooking_enabled | bool
+  tags:
+    - setup-all
+    - setup-librebooking
+    - install-all
+    - install-librebooking
+  block:
+    - name: Validate LibreBooking configuration
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/validate_config.yml"
+    - name: Install LibreBooking
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/install.yml"
+
+- name: Perform LibreBooking uninstallation tasks
+  when: not librebooking_enabled | bool
+  tags:
+    - setup-all
+    - setup-librebooking
+  block:
+    - name: Uninstall LibreBooking
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/uninstall.yml"
+
+- name: Print LibreBooking database credentials
+  when: librebooking_enabled | bool
+  tags:
+    - print-librebooking-db-credentials
+  block:
+    - name: Print database credentials for LibreBooking
+      ansible.builtin.include_tasks: "{{ role_path }}/tasks/print_db_credentials.yml"
