@@ -38,6 +38,10 @@ librebooking_install_password: "your-strong-install-password-here"
 # Optional: enable background cron jobs (for reminder emails, etc.)
 # librebooking_cron_enabled: 'true'
 
+# Optional: allow users to self-register accounts (disabled by default).
+# Enable temporarily if you need to register your admin account manually.
+# librebooking_self_registration_enabled: 'true'
+
 # Optional: pass extra LB_ environment variables to configure the application.
 # See: https://librebooking.readthedocs.io/en/stable/BASIC-CONFIGURATION.html
 # librebooking_environment_variables_additional: |
@@ -98,10 +102,58 @@ just run-tags print-librebooking-db-credentials
 
 ## Available configuration via environment variables
 
-LibreBooking supports configuration via environment variables using the pattern `LB_<KEY>`.
-The full list is documented at: https://librebooking.readthedocs.io/en/stable/BASIC-CONFIGURATION.html
+LibreBooking supports overriding any config key via environment variables. The naming convention is
+`LB_` + the config key uppercased, with dots and dashes replaced by underscores. For example:
+
+| Config key | Environment variable |
+|---|---|
+| `app.title` | `LB_APP_TITLE` |
+| `phpmailer.smtp.host` | `LB_PHPMAILER_SMTP_HOST` |
+| `authentication.oauth2.client.id` | `LB_AUTHENTICATION_OAUTH2_CLIENT_ID` |
+
+See the [upstream docs](https://librebooking.readthedocs.io/en/latest/ADVANCED-CONFIGURATION.html#environment-variable-override)
+for the full reference.
 
 Pass extra variables using `librebooking_environment_variables_additional`.
+
+## OAuth2 / SSO
+
+LibreBooking supports OAuth2 authentication with any compliant IdP (e.g. Authentik, Keycloak).
+See the [upstream OAuth2 docs](https://librebooking.readthedocs.io/en/stable/Oauth2-Configuration.html)
+for the full list of settings.
+
+**IdP setup:** create a confidential client and configure the redirect URI to:
+
+```
+https://booking.example.com/Web/oauth2-auth.php
+```
+
+Pass settings via `librebooking_environment_variables_additional`:
+
+```yaml
+librebooking_environment_variables_additional: |
+  LB_AUTHENTICATION_OAUTH2_LOGIN_ENABLED=true
+  LB_AUTHENTICATION_OAUTH2_NAME=authentik
+  LB_AUTHENTICATION_OAUTH2_URL_AUTHORIZE=https://auth.example.com/application/o/authorize/
+  LB_AUTHENTICATION_OAUTH2_URL_TOKEN=https://auth.example.com/application/o/token/
+  LB_AUTHENTICATION_OAUTH2_URL_USERINFO=https://auth.example.com/application/o/userinfo/
+  LB_AUTHENTICATION_OAUTH2_CLIENT_ID=your-client-id
+  LB_AUTHENTICATION_OAUTH2_CLIENT_SECRET=your-client-secret
+  LB_AUTHENTICATION_OAUTH2_CLIENT_URI=/Web/oauth2-auth.php
+```
+
+To redirect straight to your IdP without showing the built-in login form:
+
+```yaml
+  LB_AUTHENTICATION_HIDE_LOGIN_PROMPT=true
+```
+
+Some IdPs require a trailing slash on the authorize URL — by default LibreBooking strips it.
+To preserve it:
+
+```yaml
+  LB_AUTHENTICATION_OAUTH2_STRIP_TRAILING_SLASH=false
+```
 
 ## Notes
 

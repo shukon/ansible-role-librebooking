@@ -78,6 +78,11 @@ librebooking_log_folder: '/var/log/librebooking'
 # Enable built-in cron for background jobs (reminder emails, etc.)
 librebooking_cron_enabled: 'false'
 
+# Allow users to self-register accounts.
+# Disabled by default — enable temporarily to register your admin account
+# if you did not import sample data during first-time setup.
+librebooking_self_registration_enabled: 'false'
+
 # Additional environment variables to pass to the container.
 # Environment variable names follow the pattern: LB_<CONFIG_KEY_UPPERCASED>
 # See: https://librebooking.readthedocs.io/en/stable/BASIC-CONFIGURATION.html
