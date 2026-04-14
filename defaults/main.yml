@@ -64,7 +64,7 @@ librebooking_database_password: ''
 ########################################################################
 
 # Installation password used to access the /install/ setup wizard.
-# Set this for first install, then change or remove it after setup.
+# Use a strong password — the wizard allows database re-initialization.
 librebooking_install_password: ''
 
 # Timezone for the application container (e.g. Europe/Berlin).

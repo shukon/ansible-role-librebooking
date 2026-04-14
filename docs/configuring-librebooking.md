@@ -29,8 +29,7 @@ librebooking_enabled: true
 
 librebooking_hostname: booking.example.com
 
-# Protects the /Web/install/ setup wizard. Required on first run.
-# Remove or change this after completing the initial setup — see below.
+# Protects the /Web/install/ setup wizard. Use a strong password.
 librebooking_install_password: "your-strong-install-password-here"
 
 # Optional: set the timezone
@@ -74,8 +73,7 @@ You will be prompted for the **installation password** you set above. On the nex
 - **Check "Import sample data"** — this creates the database schema and an initial `admin`/`password` account
 - Do **not** check "Create the database" or "Create the database user" — both already exist
 
-Once the installation is complete, **remove or change `librebooking_install_password`** in your
-`vars.yml` to prevent unauthorized access to the setup page, and re-run the playbook.
+Once the installation is complete, keep `librebooking_install_password` set to a strong value to prevent unauthorized access to the setup page.
 
 ## Upgrading
 
@@ -86,8 +84,17 @@ The application will pull the new image and restart.
 librebooking_version: "4.3.0"
 ```
 
-After a major version upgrade, you may need to re-visit the `/Web/install/` page to run database
-migrations. You will need to set `librebooking_install_password` again to access the wizard.
+After a major version upgrade, you may need to run database migrations. Navigate to:
+
+```
+https://booking.example.com/Web/install/configure.php
+```
+
+If you need your database credentials again:
+
+```bash
+just run-tags print-librebooking-db-credentials
+```
 
 ## Available configuration via environment variables
 
