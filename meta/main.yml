@@ -1,11 +1,10 @@
 ---
 galaxy_info:
+  author: shukon
+  company: shukon
   role_name: librebooking
-  namespace: mother_of_all_self_hosting
-  author: mother-of-all-self-hosting
+  namespace: shukon
   description: An Ansible role for installing LibreBooking, a resource scheduling application
-  license: AGPL-3.0-or-later
-  min_ansible_version: "2.15"
   platforms:
     - name: Debian
       versions:
@@ -13,9 +12,17 @@ galaxy_info:
     - name: Ubuntu
       versions:
         - all
+    - name: ArchLinux
+      versions:
+        - all
+    - name: EL
+      versions:
+        - all
+  license: AGPL-3.0-or-later
+  min_ansible_version: "2.1"
   galaxy_tags:
     - docker
-    - self-hosting
+    - selfhosting
     - scheduling
     - booking
     - librebooking
