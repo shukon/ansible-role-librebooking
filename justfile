@@ -1,4 +1,5 @@
-# SPDX-FileCopyrightText: 2026 shukon (https://github.com/shukon)
+# SPDX-FileCopyrightText: 2023 Slavi Pantaleev
+# SPDX-FileCopyrightText: 2026 shukon
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
