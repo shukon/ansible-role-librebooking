@@ -67,7 +67,7 @@ just run-tags print-librebooking-db-credentials
 
 Then navigate to the install wizard:
 
-```
+```text
 https://booking.example.com/Web/install/
 ```
 
@@ -90,7 +90,7 @@ librebooking_version: "4.3.0"
 
 After a major version upgrade, you may need to run database migrations. Navigate to:
 
-```
+```text
 https://booking.example.com/Web/install/configure.php
 ```
 
@@ -106,7 +106,7 @@ LibreBooking supports overriding any config key via environment variables. The n
 `LB_` + the config key uppercased, with dots and dashes replaced by underscores. For example:
 
 | Config key | Environment variable |
-|---|---|
+| --- | --- |
 | `app.title` | `LB_APP_TITLE` |
 | `phpmailer.smtp.host` | `LB_PHPMAILER_SMTP_HOST` |
 | `authentication.oauth2.client.id` | `LB_AUTHENTICATION_OAUTH2_CLIENT_ID` |
@@ -124,7 +124,7 @@ for the full list of settings.
 
 **IdP setup:** create a confidential client and configure the redirect URI to:
 
-```
+```text
 https://booking.example.com/Web/oauth2-auth.php
 ```
 
