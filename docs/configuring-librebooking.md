@@ -6,6 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 # Configuring LibreBooking
 
+LibreBooking is a resource scheduling application and a FOSS fork of Booked Scheduler.
+
 This document describes how to configure LibreBooking using this Ansible role.
 
 ## Prerequisites
@@ -30,21 +32,21 @@ librebooking_enabled: true
 librebooking_hostname: booking.example.com
 
 # Protects the /Web/install/ setup wizard. Use a strong password.
-librebooking_install_password: "your-strong-install-password-here"
+librebooking_environment_variables_lb_install_password: "your-strong-install-password-here"
 
 # Optional: set the timezone
-# librebooking_timezone: "Europe/Berlin"
+# librebooking_environment_variables_lb_default_timezone: "Europe/Berlin"
 
 # Optional: enable background cron jobs (for reminder emails, etc.)
-# librebooking_cron_enabled: 'true'
+# librebooking_environment_variables_lb_cron_enabled: true
 
 # Optional: allow users to self-register accounts (disabled by default).
 # Enable temporarily if you need to register your admin account manually.
-# librebooking_self_registration_enabled: 'true'
+# librebooking_environment_variables_lb_registration_allow_self_registration: true
 
 # Optional: pass extra LB_ environment variables to configure the application.
 # See: https://librebooking.readthedocs.io/en/stable/BASIC-CONFIGURATION.html
-# librebooking_environment_variables_additional: |
+# librebooking_environment_variables_additional_variables: |
 #   LB_APP_TITLE='My Booking System'
 
 ########################################################################
@@ -56,13 +58,12 @@ librebooking_install_password: "your-strong-install-password-here"
 
 ## First-time setup
 
-LibreBooking does **not** initialize its database schema automatically. You must run the
-web-based install wizard on first install.
+LibreBooking does **not** initialize its database schema automatically. You must run the web-based install wizard on first install.
 
 After running the playbook for the first time, retrieve your database credentials:
 
 ```bash
-just run-tags print-librebooking-db-credentials
+ansible-playbook -i inventory/hosts setup.yml --tags=print-db-credentials-librebooking
 ```
 
 Then navigate to the install wizard:
@@ -77,12 +78,11 @@ You will be prompted for the **installation password** you set above. On the nex
 - **Check "Import sample data"** — this creates the database schema and an initial `admin`/`password` account
 - Do **not** check "Create the database" or "Create the database user" — both already exist
 
-Once the installation is complete, keep `librebooking_install_password` set to a strong value to prevent unauthorized access to the setup page.
+Once the installation is complete, keep `librebooking_environment_variables_lb_install_password` set to a strong value to prevent unauthorized access to the setup page.
 
 ## Upgrading
 
-To upgrade LibreBooking, update `librebooking_version` to a new version and re-run the playbook.
-The application will pull the new image and restart.
+To upgrade LibreBooking, update `librebooking_version` to a new version and re-run the playbook. The application will pull the new image and restart.
 
 ```yaml
 librebooking_version: "4.3.0"
@@ -97,13 +97,12 @@ https://booking.example.com/Web/install/configure.php
 If you need your database credentials again:
 
 ```bash
-just run-tags print-librebooking-db-credentials
+ansible-playbook -i inventory/hosts setup.yml --tags=print-db-credentials-librebooking
 ```
 
 ## Available configuration via environment variables
 
-LibreBooking supports overriding any config key via environment variables. The naming convention is
-`LB_` + the config key uppercased, with dots and dashes replaced by underscores. For example:
+LibreBooking supports overriding any config key via environment variables. The naming convention is `LB_` + the config key uppercased, with dots and dashes replaced by underscores. For example:
 
 | Config key | Environment variable |
 | --- | --- |
@@ -111,16 +110,13 @@ LibreBooking supports overriding any config key via environment variables. The n
 | `phpmailer.smtp.host` | `LB_PHPMAILER_SMTP_HOST` |
 | `authentication.oauth2.client.id` | `LB_AUTHENTICATION_OAUTH2_CLIENT_ID` |
 
-See the [upstream docs](https://librebooking.readthedocs.io/en/latest/ADVANCED-CONFIGURATION.html#environment-variable-override)
-for the full reference.
+See the [upstream docs](https://librebooking.readthedocs.io/en/latest/ADVANCED-CONFIGURATION.html#environment-variable-override) for the full reference.
 
-Pass extra variables using `librebooking_environment_variables_additional`.
+Pass extra variables using `librebooking_environment_variables_additional_variables`.
 
 ## OAuth2 / SSO
 
-LibreBooking supports OAuth2 authentication with any compliant IdP (e.g. Authentik, Keycloak).
-See the [upstream OAuth2 docs](https://librebooking.readthedocs.io/en/stable/Oauth2-Configuration.html)
-for the full list of settings.
+LibreBooking supports OAuth2 authentication with any compliant IdP (e.g. Authentik, Keycloak). See the [upstream OAuth2 docs](https://librebooking.readthedocs.io/en/stable/Oauth2-Configuration.html) for the full list of settings.
 
 **IdP setup:** create a confidential client and configure the redirect URI to:
 
@@ -128,10 +124,10 @@ for the full list of settings.
 https://booking.example.com/Web/oauth2-auth.php
 ```
 
-Pass settings via `librebooking_environment_variables_additional`:
+Pass settings via `librebooking_environment_variables_additional_variables`:
 
 ```yaml
-librebooking_environment_variables_additional: |
+librebooking_environment_variables_additional_variables: |
   LB_AUTHENTICATION_OAUTH2_LOGIN_ENABLED=true
   LB_AUTHENTICATION_OAUTH2_NAME=authentik
   LB_AUTHENTICATION_OAUTH2_URL_AUTHORIZE=https://auth.example.com/application/o/authorize/
@@ -148,13 +144,8 @@ To redirect straight to your IdP without showing the built-in login form:
   LB_AUTHENTICATION_HIDE_LOGIN_PROMPT=true
 ```
 
-Some IdPs require a trailing slash on the authorize URL — by default LibreBooking strips it.
-To preserve it:
+Some IdPs require a trailing slash on the authorize URL — by default LibreBooking strips it. To preserve it:
 
 ```yaml
   LB_AUTHENTICATION_OAUTH2_STRIP_TRAILING_SLASH=false
 ```
-
-## Notes
-
-- **Port**: LibreBooking listens on port `8080` internally (not `80`).
