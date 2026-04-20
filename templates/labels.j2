@@ -15,6 +15,17 @@ traefik.docker.network={{ librebooking_container_labels_traefik_docker_network }
 
 {% set middlewares = [] %}
 
+{% if librebooking_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ librebooking_identifier }}-slashless-redirect.redirectregex.regex=^({{ librebooking_container_labels_traefik_path_prefix | quote }})$
+traefik.http.middlewares.{{ librebooking_identifier }}-slashless-redirect.redirectregex.replacement=${1}/
+{% set middlewares = middlewares + [librebooking_identifier + '-slashless-redirect'] %}
+{% endif %}
+
+{% if librebooking_container_labels_traefik_path_prefix != '/' %}
+traefik.http.middlewares.{{ librebooking_identifier }}-strip-prefix.stripprefix.prefixes={{ librebooking_container_labels_traefik_path_prefix }}
+{% set middlewares = middlewares + [librebooking_identifier + '-strip-prefix'] %}
+{% endif %}
+
 {% if librebooking_container_labels_traefik_additional_request_headers.keys() | length > 0 %}
 {% for name, value in librebooking_container_labels_traefik_additional_request_headers.items() %}
 traefik.http.middlewares.{{ librebooking_identifier }}-add-request-headers.headers.customrequestheaders.{{ name }}={{ value }}
@@ -46,6 +57,6 @@ traefik.http.routers.{{ librebooking_identifier }}.tls.certResolver={{ librebook
 traefik.http.services.{{ librebooking_identifier }}.loadbalancer.server.port={{ librebooking_container_http_port }}
 {% endif %}
 
-{% for label in librebooking_container_labels_additional_labels %}
-{{ label }}
+{% for arg in librebooking_container_labels_additional_labels %}
+{{ arg }}
 {% endfor %}

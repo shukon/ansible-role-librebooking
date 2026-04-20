@@ -30,7 +30,7 @@
 - name: Print LibreBooking database credentials
   when: librebooking_enabled | bool
   tags:
-    - print-librebooking-db-credentials
+    - print-db-credentials-librebooking
   block:
     - name: Print database credentials for LibreBooking
       ansible.builtin.include_tasks: "{{ role_path }}/tasks/print_db_credentials.yml"

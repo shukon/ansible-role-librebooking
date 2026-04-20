@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2023 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 # SPDX-FileCopyrightText: 2026 shukon
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
@@ -86,7 +86,7 @@
   register: librebooking_config_path_stat
 
 # We just want to notify the user. Deleting data is too destructive.
-- name: Notify if LibreBooking configuration files remain
+- name: Inject the message about the remaining LibreBooking local path for configuration files
   when: librebooking_config_path_stat.stat.exists | bool
   ansible.builtin.set_fact:
     devture_playbook_runtime_messages_list: |
@@ -103,7 +103,7 @@
     path: "{{ librebooking_uploads_images_path }}"
   register: librebooking_uploads_images_path_stat
 
-- name: Notify if LibreBooking uploaded images remain
+- name: Inject the message about the remaining LibreBooking local path for uploaded images
   when: librebooking_uploads_images_path_stat.stat.exists | bool
   ansible.builtin.set_fact:
     devture_playbook_runtime_messages_list: |
@@ -120,7 +120,7 @@
     path: "{{ librebooking_uploads_reservation_path }}"
   register: librebooking_uploads_reservation_path_stat
 
-- name: Notify if LibreBooking reservation uploads remain
+- name: Inject the message about the remaining LibreBooking local path for uploaded reservations
   when: librebooking_uploads_reservation_path_stat.stat.exists | bool
   ansible.builtin.set_fact:
     devture_playbook_runtime_messages_list: |
