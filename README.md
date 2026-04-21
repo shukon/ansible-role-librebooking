@@ -10,8 +10,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
 This is an [Ansible](https://www.ansible.com/) role which installs [LibreBooking](https://github.com/LibreBooking/librebooking) to run as a [Docker](https://www.docker.com/) container wrapped in a systemd service.
 
-LibreBooking is a resource scheduling application and a FOSS fork of Booked Scheduler.
-
 This role *implicitly* depends on:
 
 - [`com.devture.ansible.role.playbook_help`](https://github.com/devture/com.devture.ansible.role.playbook_help)

@@ -1,5 +1,5 @@
 # SPDX-FileCopyrightText: 2023-2025 Slavi Pantaleev
-# SPDX-FileCopyrightText: 2025 Suguru Hirahara
+# SPDX-FileCopyrightText: 2025, 2026 Suguru Hirahara
 # SPDX-FileCopyrightText: 2026 shukon
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
@@ -22,9 +22,9 @@
   ansible.builtin.template:
     src: "{{ role_path }}/templates/{{ item }}.j2"
     dest: "{{ librebooking_base_path }}/{{ item }}"
+    mode: "0640"
     owner: "{{ librebooking_uid }}"
     group: "{{ librebooking_gid }}"
-    mode: "0640"
   with_items:
     - env
     - labels
