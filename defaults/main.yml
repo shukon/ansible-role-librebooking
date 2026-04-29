@@ -88,6 +88,12 @@ librebooking_container_labels_traefik_entrypoints: web-secure
 librebooking_container_labels_traefik_tls: "{{ librebooking_container_labels_traefik_entrypoints != 'web' }}"
 librebooking_container_labels_traefik_tls_certResolver: default  # noqa var-naming
 
+# Controls whether Traefik should redirect bare-root requests to /Web/.
+# LibreBooking's UI lives at /Web/; Apache builds its Location header using the
+# container's internal port (8080), which is not reachable through a proxy.
+# Handling the redirect here avoids the bad port entirely.
+librebooking_container_labels_traefik_redirect_root_to_web_enabled: true
+
 # Controls which additional headers to attach to all HTTP requests.
 # To add your own custom request headers, use `librebooking_container_labels_traefik_additional_request_headers_custom`.
 librebooking_container_labels_traefik_additional_request_headers: "{{ librebooking_container_labels_traefik_additional_request_headers_auto | combine(librebooking_container_labels_traefik_additional_request_headers_custom) }}"
